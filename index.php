@@ -1,3 +1,7 @@
+<?php
+require_once __DIR__ . '/app/model.php';
+$players = new Players();
+?>
 <!DOCTYPE html>
 <html>
   <head>
