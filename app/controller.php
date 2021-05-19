@@ -1,9 +1,10 @@
 <?php
 
-/*require_once __DIR__ . '/model.php';
- $players = new Players();
+require_once __DIR__ . '/model.php';
 
-  if($_POST['action'] == 'delete'):
+$players = new Players();
+
+  /*if($_POST['action'] == 'delete'):
     if($usersModel->delete_user($_POST['id']) == 1):
       $arrayName = array('status' => 'true' );
       echo json_encode($arrayName);

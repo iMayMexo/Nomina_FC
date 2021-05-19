@@ -3,64 +3,145 @@
 
     class Players 
     {
+
+        public $data = array();
+
+        public $goals = array();
+
+        public $rules = array();
+
+        private $teamGoals = array();
+
+        private $teamGoal = 0;
+
+        /**
+         * Players constructor. Read *.json files.
+         */
         public function __construct()
         {
-            $json = file_get_contents(__DIR__ . "/data.json");
-	        $json = json_encode($json);
-            $json = json_decode($json, true);
-            ___($json,true,true);
+            $json           = file_get_contents(__DIR__ . "/data.json");
+            $conf           = file_get_contents(__DIR__ . "/config.json");
+
+            $this->data     = json_decode($json, true);
+            $this->rules    = json_decode($conf, true);
+
+            $this->setTeamGoal();
+
+            //___($this->data);
         }
 
-        /*public function get_users()
-        {
-            $users = $this->_db->prepare('SELECT * FROM user ORDER BY id ASC');
-            $users->execute();
-            $users = $users->fetchAll();
-            return $users;
-        }
 
-        public function new_user($data)
+        /**
+         * @param $name
+         * @param $value
+         */
+        public function __set($name, $value)
         {
-            if (is_object($this->_db)){
-                $insert = $this->_db->prepare('INSERT INTO user (firstname,lastname,email,password)
-            values (:firstname,:lastname,:email,:password) ');
-                $insert->execute(array(
-                    ':firstname'=> $data[0],
-                    ':lastname'=> $data[1],
-                    ':email'=> $data[2],
-                    ':password'=> $data[3],
-                ));
-                $insert = $insert->rowCount();
+            //->TODO: Implement __set() method.
+            if (property_exists($this, $name)) {
+                unset($this->$name);
+                $this->$name = $value;
             }
-            else{
-                var_dump($this->_db);
-                exit();
+        }
+
+        /**
+         * @param $name
+         * @return mixed
+         */
+        public function __get($name)
+        {
+            // TODO: Implement __get() method.
+            if (property_exists($this, $name)) {
+                return $this->$name;
+            } else {
+                return false;
             }
-            return $insert;
         }
 
-        public function update_user($data)
+        /**
+         * @param $team
+         * @param $goals
+         * @return mixed
+         */
+        public function getGoals($team,$goals)
         {
-            $update = $this->_db->prepare('UPDATE users SET firstname = :firstname, lastname = :lastname, email = :email, password = :password WHERE id = :id');
-            $update->execute(array(':id'=> $data[0],':firstname'=> $data[1],':lastname'=> $data[2],':email'=> $data[3],':password'=> $data[4]));
-            $update = $update->rowCount();
-            return $update;
+            if (!isset($this->goals[$team]))
+                $this->goals[$team] = [
+                    'goals'         => 0,
+                    'productivity'  => 0
+                ];
+
+            $this->goals[$team]['goals'] += $goals;
+
+            return $this->goals[$team];
         }
 
-        public function delete_user($data)
+        /**
+         * @param $level
+         * @param $goals
+         * @return float
+         */
+        public function getIndividualProductivity($level,$goals)
         {
-            $delete = $this->_db->prepare('DELETE FROM user WHERE id = :data');
-            $delete->execute(array(':data'=>$data));
-            $delete = $delete->rowCount();
-            return $delete;
+            try {
+                if(empty($this->rules))
+                    throw new \InvalidArgumentException('There are not rules to calculate the productivity');
+            
+                foreach ($this->rules['reglas'] as $item => $value){
+                    if((string)$value['nivel'] == (string)$level)
+                    {
+                        //___($nivel);
+                        return round(($goals / $value['meta']) * 100,2);
+                    }
+                }
+            
+            }
+            catch(Exception $e){
+                ___($e->getMessage());
+            }
         }
 
-        public function view_user($data)
+        /**
+         * Setup the goals to achieve by team;
+         */
+        public function setTeamGoal()
         {
-            $view = $this->_db->prepare('SELECT * FROM user WHERE id = :data');
-            $view->execute(array(':data'=>$data));
-            $view = $view->fetch();
-            return $view;
-        }*/
-}
+            try {
+                if(empty($this->rules))
+                    throw new \InvalidArgumentException('There are not rules to calculate the productivity');
+            
+                foreach ($this->rules['reglas'] as $item => $value){
+                    $this->teamGoal += $value['meta'];
+                }
+            
+            }
+            catch(Exception $e){
+                ___($e->getMessage());
+            }
+        }
+
+        /**
+         * @param $level
+         * @param $goals
+         * @param string $team
+         * @return float
+        */
+        public function getTeamProductivity($goals,$team = '')
+        {
+            try {
+                if(empty($this->teamGoal))
+                    throw new \InvalidArgumentException('There are not goals to calculate the productivity');
+
+                $teamProductivity = round(($goals / $this->__get('teamGoal')) * 100,2);
+
+                $this->goals[$team]['productivity'] = $teamProductivity;
+
+                return $teamProductivity;
+
+            }
+            catch(Exception $e){
+                ___($e->getMessage());
+            }
+        }
+    }
 ?>
