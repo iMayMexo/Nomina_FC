@@ -29,28 +29,27 @@ require_once __DIR__ . '/app/controller.php';
                     <td>Team</td>
                     <td>Complete name</td>
                     <td>Level</td>
-                    <td>Goals</td>
+                    <td>Goals scored</td>
                     <td>Salary</td>
                     <td>Bonus</td>
                     <td>Ind. %</td>
+                    <td>Mean %</td>
                     <td>Total</td>
                 </tr>
                 </thead>
                 <tbody>
                 <?php
-                foreach ($players->data['jugadores'] as $item => $value):
-                    $players->getGoals($value['equipo'], $value['goles']);
-                    $productivity = $players->getIndividualProductivity($value['nivel'],$value['goles']);
-                    ?>
+                foreach ($players->data['jugadores'] as $item => $value): ?>
                     <tr>
                         <td><?= $value['equipo'];  ?></td>
                         <td><?= $value['nombre'];  ?></td>
                         <td><?= $value['nivel'];   ?></td>
                         <td><?= $value['goles'];   ?></td>
-                        <td><?= $value['sueldo'];  ?></td>
-                        <td><?= $value['bono'];    ?></td>
-                        <td><?= $productivity;    ?> %</td>
-                        <td></td>
+                        <td>$<?= number_format($value['sueldo'],2);  ?></td>
+                        <td>$<?= number_format($value['bono'],2);    ?></td>
+                        <td><?= $value['productivity']; ?> %</td>
+                        <td><?= $value['mean'];?> %</td>
+                        <td>$ <?=number_format($value['total'],2);?></td>
                     </tr>
                 <?php endforeach; ?>
                 </tbody>
@@ -65,20 +64,20 @@ require_once __DIR__ . '/app/controller.php';
                 <thead>
                     <tr>
                         <td>Team</td>
-                        <td>Total goals</td>
+                        <td>Total goals to achieve</td>
+                        <td>Total goals scored</td>
                         <td>Team %</td>
                     </tr>
                 </thead>
                 <tbody>
-                <?php foreach ($players->goals as $item => $value):
-                        $teamProductivity = $players->getTeamProductivity($value['goals'],$item);
-                    ?>
+                <?php foreach ($players->teamSummary as $item => $value): ?>
                 <tr>
                     <td><?= $item ?></td>
                     <td><?= $value['goals'] ?></td>
-                    <td><?= $teamProductivity ?> %</td>
+                    <td><?= $value['scored'] ?></td>
+                    <td><?= $value['productivity'] ?> %</td>
                 </tr>
-                <?php endforeach; ?>
+                <?php endforeach;?>
                 </tbody>
             </table>
         </div>
@@ -87,6 +86,7 @@ require_once __DIR__ . '/app/controller.php';
     <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
             <strong>By Carlos M. G&oacute;mez</strong>
+            <?php // ___($players->teamSummary) ?>
         </div>
     </div>
 </div>
